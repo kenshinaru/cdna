@@ -4,7 +4,6 @@
     "express": "*",
     "morgan": "*",
     "multer": "*",
-    "playwright": "*",
     "serve-favicon": "*"
   }
 }
