@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ 
   storage: storage,
-  limits: { fileSize: 200 * 1024 * 1024 }
+  limits: { fileSize: 5 * 1024 * 1024 * 1024 } // 5 GB
 })
 
 app.set('json spaces', 4)
@@ -30,10 +30,10 @@ app.use(express.urlencoded({ extended: true }))
 app.use(favicon(path.join(import.meta.dirname, 'favicon.ico')))
 app.use(morgan('combined'))
 
-app.use('/file', express.static(tmpDir))
+app.use('/dl', express.static(tmpDir))
 
 app.use((req, res, next) => {
-  const threeDays = 3 * 24 * 60 * 60 * 1000
+  const threeDays = 30 * 60 * 1000
   fs.readdirSync(tmpDir).forEach(file => {
     const filePath = path.join(tmpDir, file)
     const stat = fs.statSync(filePath)
@@ -53,23 +53,23 @@ app.post('/upload', upload.single('file'), (req, res) => {
     })
   }
 
-  const fileUrl = `https://${req.hostname}/file/${req.file.filename}`
+  const fileUrl = `https://${req.hostname}/dl/${req.file.filename}`
   
   res.json({
-    success: true,
-    message: 'File uploaded successfully',
-    filename: req.file.filename,
-    originalname: req.file.originalname,
+    status: true,
+    data: {
+    filename: req.file.originalname,
     size: req.file.size,
     mimetype: req.file.mimetype,
     url: fileUrl,
     expires: 'File will be automatically deleted after 3 days'
+    }
   })
 })
 
 app.get('/', (req, res) => {
   res.json({
-    message: 'UlzNeko Uploader API',
+    message: 'Arincy Uploader API',
     endpoint: {
       method: 'POST',
       path: '/upload',
